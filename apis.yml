@@ -1,0 +1,50 @@
+aid: cni
+name: Container Network Interface (CNI)
+description: >-
+  CNI (Container Network Interface) is a CNCF incubating project that
+  defines a specification and libraries for configuring network interfaces
+  in Linux containers. It provides a simple interface between the container
+  runtime and network implementation plugins, enabling pluggable networking
+  for Kubernetes and other container orchestrators. CNI includes reference
+  plugins for bridge, IPVLAN, MACVLAN, loopback, and other network types.
+url: https://www.cni.dev
+image: https://kinlane-productions2.s3.amazonaws.com/apis-json/apis-json-logo.jpg
+tags:
+- Networking
+- Containers
+- Kubernetes
+- Plugins
+- Cloud Native
+- Incubating
+created: '2026-03-16'
+modified: '2026-03-16'
+specificationVersion: '0.19'
+type: Index
+apis:
+- aid: cni:cni-spec
+  name: CNI Specification
+  description: >-
+    The CNI specification defines the interface between container runtimes
+    and network plugins. It specifies how runtimes invoke plugins via
+    environment variables and stdin configuration, and how plugins respond
+    with network interface details. The spec covers ADD, DEL, CHECK, and
+    VERSION operations for managing container network attachments.
+  humanURL: https://www.cni.dev/docs/spec/
+  properties:
+  - type: Documentation
+    url: https://www.cni.dev/docs/spec/
+  tags:
+  - Specification
+  - Network Plugins
+common:
+- type: Documentation
+  name: CNI Documentation
+  description: Official CNI documentation.
+  url: https://www.cni.dev/docs/
+- type: GitHubOrg
+  name: CNI GitHub
+  description: Source code and plugins.
+  url: https://github.com/containernetworking
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com
