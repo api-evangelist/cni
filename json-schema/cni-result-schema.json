@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://www.cni.dev/schemas/result.json",
+  "title": "CNI Plugin Result",
+  "description": "Schema for the Container Network Interface (CNI) plugin result document returned on stdout after a successful ADD or CHECK operation. The result reports the network interfaces created, IP addresses assigned, routes configured, and DNS settings applied in the container network namespace. This document is also passed as the prevResult field when chaining multiple CNI plugins together.",
+  "type": "object",
+  "required": ["cniVersion"],
+  "properties": {
+    "cniVersion": {
+      "type": "string",
+      "description": "The CNI specification version this result conforms to. Should match the cniVersion from the network configuration.",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "examples": ["1.0.0", "0.4.0", "0.3.1"]
+    },
+    "interfaces": {
+      "type": "array",
+      "description": "List of network interfaces created or configured during the ADD operation. Index 0 is typically the host-side veth, index 1 is the container-side interface.",
+      "items": {
+        "$ref": "#/$defs/Interface"
+      }
+    },
+    "ips": {
+      "type": "array",
+      "description": "List of IP addresses assigned to the container's network interfaces by the IPAM plugin.",
+      "items": {
+        "$ref": "#/$defs/IPConfig"
+      }
+    },
+    "routes": {
+      "type": "array",
+      "description": "List of routes that were added to the container network namespace.",
+      "items": {
+        "$ref": "#/$defs/Route"
+      }
+    },
+    "dns": {
+      "$ref": "#/$defs/DNS"
+    }
+  },
+  "$defs": {
+    "Interface": {
+      "type": "object",
+      "description": "A network interface created or configured by the CNI plugin. May represent a host-side veth peer, a container-side interface, or a bridge interface.",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the network interface as it appears in the network namespace.",
+          "examples": ["eth0", "net1", "veth1a2b3c4d", "cni0"]
+        },
+        "mac": {
+          "type": "string",
+          "description": "Hardware (MAC) address of the network interface.",
+          "pattern": "^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$",
+          "examples": ["0a:58:0a:f4:00:01", "02:42:ac:11:00:02"]
+        },
+        "mtu": {
+          "type": "integer",
+          "description": "Maximum Transmission Unit (MTU) configured on this interface in bytes.",
+          "minimum": 68,
+          "maximum": 65535,
+          "examples": [1500, 1450, 9000]
+        },
+        "sandbox": {
+          "type": "string",
+          "description": "Path to the network namespace that contains this interface. Empty string or absent means the interface is in the host network namespace.",
+          "examples": ["/proc/12345/ns/net", "/var/run/netns/mynet", ""]
+        },
+        "socketPath": {
+          "type": "string",
+          "description": "Path to a Unix domain socket for plugins that expose per-interface communication channels."
+        },
+        "pciID": {
+          "type": "string",
+          "description": "PCI device identifier for the physical or virtual function underlying this interface, used with SR-IOV.",
+          "examples": ["0000:03:00.1", "0000:05:00.2"]
+        }
+      }
+    },
+    "IPConfig": {
+      "type": "object",
+      "description": "An IP address and associated gateway assigned to a container interface by the IPAM plugin.",
+      "required": ["address"],
+      "properties": {
+        "address": {
+          "type": "string",
+          "description": "The IP address and subnet prefix length in CIDR notation assigned to the container interface.",
+          "examples": ["10.244.0.5/24", "192.168.1.100/24", "fd00::1/64"]
+        },
+        "gateway": {
+          "type": "string",
+          "description": "The default gateway IP address for this address family. Used to populate the container's routing table.",
+          "examples": ["10.244.0.1", "192.168.1.1", "fd00::1"]
+        },
+        "interface": {
+          "type": "integer",
+          "description": "Zero-based index into the interfaces array indicating which interface this IP address is assigned to.",
+          "minimum": 0
+        }
+      }
+    },
+    "Route": {
+      "type": "object",
+      "description": "A routing table entry added to the container network namespace.",
+      "required": ["dst"],
+      "properties": {
+        "dst": {
+          "type": "string",
+          "description": "Destination network prefix in CIDR notation that this route matches.",
+          "examples": ["0.0.0.0/0", "10.0.0.0/8", "172.16.0.0/12", "::/0"]
+        },
+        "gw": {
+          "type": "string",
+          "description": "Next-hop gateway IP address for packets matching this route. If absent, the gateway from the IPAM result is used.",
+          "examples": ["10.244.0.1", "fd00::1"]
+        },
+        "mtu": {
+          "type": "integer",
+          "description": "MTU for this specific route, used to configure path MTU.",
+          "minimum": 68,
+          "maximum": 65535
+        },
+        "advmss": {
+          "type": "integer",
+          "description": "Advertised maximum segment size for TCP connections using this route.",
+          "minimum": 1
+        }
+      }
+    },
+    "DNS": {
+      "type": "object",
+      "description": "DNS resolver configuration to be applied in the container network namespace.",
+      "properties": {
+        "nameservers": {
+          "type": "array",
+          "description": "Ordered list of DNS server IP addresses to use for name resolution.",
+          "items": {
+            "type": "string",
+            "description": "IP address of a DNS server."
+          },
+          "examples": [["10.96.0.10"], ["8.8.8.8", "8.8.4.4"]]
+        },
+        "domain": {
+          "type": "string",
+          "description": "Default domain name for unqualified hostnames.",
+          "examples": ["cluster.local", "example.com"]
+        },
+        "search": {
+          "type": "array",
+          "description": "List of DNS search domains appended to unqualified hostnames during resolution.",
+          "items": {
+            "type": "string",
+            "description": "A DNS search domain."
+          },
+          "examples": [["default.svc.cluster.local", "svc.cluster.local", "cluster.local"]]
+        },
+        "options": {
+          "type": "array",
+          "description": "Resolver options written to resolv.conf, such as 'ndots:5' or 'single-request'.",
+          "items": {
+            "type": "string",
+            "description": "A resolver option string."
+          },
+          "examples": [["ndots:5"], ["ndots:2", "timeout:3"]]
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "cniVersion": "1.0.0",
+      "interfaces": [
+        {
+          "name": "cni0",
+          "mac": "0a:58:0a:f4:00:01",
+          "sandbox": ""
+        },
+        {
+          "name": "veth1a2b3c4d",
+          "mac": "0a:58:0a:f4:00:02",
+          "sandbox": ""
+        },
+        {
+          "name": "eth0",
+          "mac": "0a:58:0a:f4:00:03",
+          "sandbox": "/proc/12345/ns/net"
+        }
+      ],
+      "ips": [
+        {
+          "address": "10.244.0.5/24",
+          "gateway": "10.244.0.1",
+          "interface": 2
+        }
+      ],
+      "routes": [
+        {
+          "dst": "0.0.0.0/0",
+          "gw": "10.244.0.1"
+        }
+      ],
+      "dns": {
+        "nameservers": ["10.96.0.10"],
+        "search": [
+          "default.svc.cluster.local",
+          "svc.cluster.local",
+          "cluster.local"
+        ],
+        "options": ["ndots:5"]
+      }
+    }
+  ]
+}

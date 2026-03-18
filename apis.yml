@@ -17,7 +17,7 @@ tags:
 - Cloud Native
 - Incubating
 created: '2026-03-16'
-modified: '2026-03-16'
+modified: '2026-03-18'
 specificationVersion: '0.19'
 type: Index
 apis:
@@ -33,18 +33,50 @@ apis:
   properties:
   - type: Documentation
     url: https://www.cni.dev/docs/spec/
+  - type: GitHubRepository
+    url: https://github.com/containernetworking/cni
+  - type: JSONSchema
+    url: json-schema/cni-network-config-schema.json
+  - type: JSONSchema
+    url: json-schema/cni-result-schema.json
   tags:
   - Specification
   - Network Plugins
+- aid: cni:cni-plugins
+  name: CNI Reference Plugins
+  description: >-
+    A collection of reference and example networking plugins maintained by the
+    CNI team that implement the CNI specification. Includes main plugins such as
+    bridge, ipvlan, macvlan, ptp, host-device, and loopback, as well as meta
+    plugins such as portmap, bandwidth, firewall, and sbr for additional
+    networking functionality.
+  humanURL: https://www.cni.dev/plugins/current/
+  properties:
+  - type: Documentation
+    url: https://www.cni.dev/plugins/current/
+  - type: GitHubRepository
+    url: https://github.com/containernetworking/plugins
+  tags:
+  - Network Plugins
+  - Networking
+  - Containers
+  - Kubernetes
+  - Linux
 common:
+- type: Website
+  url: https://www.cni.dev/
 - type: Documentation
-  name: CNI Documentation
-  description: Official CNI documentation.
   url: https://www.cni.dev/docs/
-- type: GitHubOrg
-  name: CNI GitHub
-  description: Source code and plugins.
+- type: GitHub Organization
   url: https://github.com/containernetworking
+- type: GitHubRepository
+  url: https://github.com/containernetworking/cni
+- type: JSON-LD
+  url: json-ld/cni-context.jsonld
+- type: JSONSchema
+  url: json-schema/cni-network-config-schema.json
+- type: JSONSchema
+  url: json-schema/cni-result-schema.json
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com

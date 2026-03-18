@@ -1,0 +1,479 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://www.cni.dev/schemas/network-config.json",
+  "title": "CNI Network Configuration",
+  "description": "Schema for the Container Network Interface (CNI) network configuration document. This JSON object is passed to a CNI plugin via stdin when the container runtime invokes the plugin to attach (ADD), detach (DEL), or check (CHECK) a container's network interface. The configuration specifies the plugin type, IPAM settings, capabilities, and plugin-specific parameters.",
+  "type": "object",
+  "required": ["cniVersion", "name", "type"],
+  "properties": {
+    "cniVersion": {
+      "type": "string",
+      "description": "The version of the CNI specification this configuration conforms to.",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "examples": ["1.0.0", "0.4.0", "0.3.1"]
+    },
+    "cniVersions": {
+      "type": "array",
+      "description": "List of CNI specification versions this plugin supports, used in VERSION responses.",
+      "items": {
+        "type": "string",
+        "description": "A supported CNI spec version string.",
+        "pattern": "^\\d+\\.\\d+\\.\\d+$"
+      }
+    },
+    "name": {
+      "type": "string",
+      "description": "Network name. Must be unique across all network configurations on a host. Used to identify the network when multiple configurations exist.",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]*$",
+      "examples": ["mynet", "k8s-pod-network", "bridge-net"]
+    },
+    "type": {
+      "type": "string",
+      "description": "Name of the CNI plugin binary to invoke. The container runtime will search for an executable with this name in the configured plugin search path.",
+      "minLength": 1,
+      "examples": ["bridge", "ipvlan", "macvlan", "ptp", "host-device", "loopback", "flannel", "calico", "weave-net"]
+    },
+    "args": {
+      "type": "object",
+      "description": "Optional additional arguments provided by the container runtime. The CNI_ARGS environment variable supersedes this field when both are set.",
+      "properties": {
+        "cni": {
+          "type": "object",
+          "description": "Well-known CNI arguments including disable-check.",
+          "properties": {
+            "disable-check": {
+              "type": "boolean",
+              "description": "If true, the runtime will not invoke the CHECK operation for this attachment."
+            },
+            "aliases": {
+              "type": "object",
+              "description": "Network-scoped aliases for this container attachment.",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "ipMasq": {
+      "type": "boolean",
+      "description": "If true, the plugin should configure IP masquerade (NAT) on the host for traffic leaving the network."
+    },
+    "ipam": {
+      "$ref": "#/$defs/IPAM"
+    },
+    "dns": {
+      "$ref": "#/$defs/DNS"
+    },
+    "capabilities": {
+      "type": "object",
+      "description": "Map of capability names to boolean values indicating which runtime capabilities this plugin supports. Used by the runtime to determine which well-known fields to pass in runtimeConfig.",
+      "properties": {
+        "portMappings": {
+          "type": "boolean",
+          "description": "Plugin supports port mapping configuration."
+        },
+        "ipRanges": {
+          "type": "boolean",
+          "description": "Plugin supports IP range constraints."
+        },
+        "bandwidth": {
+          "type": "boolean",
+          "description": "Plugin supports traffic bandwidth limiting."
+        },
+        "dns": {
+          "type": "boolean",
+          "description": "Plugin supports DNS configuration injection."
+        },
+        "mac": {
+          "type": "boolean",
+          "description": "Plugin supports explicit MAC address assignment."
+        },
+        "aliases": {
+          "type": "boolean",
+          "description": "Plugin supports container network aliases."
+        },
+        "infinibandGUID": {
+          "type": "boolean",
+          "description": "Plugin supports InfiniBand GUID assignment."
+        },
+        "deviceID": {
+          "type": "boolean",
+          "description": "Plugin supports device ID assignment for SR-IOV."
+        }
+      },
+      "additionalProperties": {
+        "type": "boolean"
+      }
+    },
+    "runtimeConfig": {
+      "type": "object",
+      "description": "Runtime-injected configuration values corresponding to the declared capabilities. Populated by the container runtime with per-attachment values such as port mappings.",
+      "properties": {
+        "portMappings": {
+          "type": "array",
+          "description": "List of port mappings to configure, if portMappings capability is set.",
+          "items": {
+            "$ref": "#/$defs/PortMapping"
+          }
+        },
+        "bandwidth": {
+          "$ref": "#/$defs/BandwidthEntry"
+        },
+        "dns": {
+          "$ref": "#/$defs/DNS"
+        },
+        "mac": {
+          "type": "string",
+          "description": "Explicit MAC address to assign to the container interface.",
+          "pattern": "^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$"
+        },
+        "ipRanges": {
+          "type": "array",
+          "description": "IP address ranges from which the IPAM plugin should allocate an address.",
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/IPRange"
+            }
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "prevResult": {
+      "$ref": "#/$defs/Result"
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "IPAM": {
+      "type": "object",
+      "description": "IP Address Management (IPAM) plugin configuration. Specifies the IPAM plugin to use and its configuration for allocating IP addresses to the container interface.",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Name of the IPAM plugin binary to invoke for address allocation.",
+          "examples": ["host-local", "dhcp", "static", "calico-ipam", "whereabouts"]
+        },
+        "subnet": {
+          "type": "string",
+          "description": "CIDR notation subnet from which to allocate IP addresses (used by host-local plugin).",
+          "examples": ["10.244.0.0/24", "192.168.1.0/24"]
+        },
+        "rangeStart": {
+          "type": "string",
+          "description": "First IP address in the allocation range. Must be within the subnet.",
+          "format": "ipv4"
+        },
+        "rangeEnd": {
+          "type": "string",
+          "description": "Last IP address in the allocation range. Must be within the subnet.",
+          "format": "ipv4"
+        },
+        "gateway": {
+          "type": "string",
+          "description": "Gateway IP address for the subnet. Assigned to the host-side interface.",
+          "format": "ipv4"
+        },
+        "routes": {
+          "type": "array",
+          "description": "List of routes to add to the container network namespace.",
+          "items": {
+            "$ref": "#/$defs/Route"
+          }
+        },
+        "dataDir": {
+          "type": "string",
+          "description": "Directory used by host-local plugin to store IP allocation state.",
+          "default": "/var/lib/cni/networks"
+        },
+        "resolvConf": {
+          "type": "string",
+          "description": "Path to a resolv.conf file to use for DHCP DNS configuration."
+        },
+        "ranges": {
+          "type": "array",
+          "description": "Multiple IP address ranges for allocation. Each inner array is a set of ranges sharing the same subnet.",
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/IPRange"
+            }
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "DNS": {
+      "type": "object",
+      "description": "DNS configuration to apply to the container network namespace.",
+      "properties": {
+        "nameservers": {
+          "type": "array",
+          "description": "List of DNS nameserver IP addresses in priority order.",
+          "items": {
+            "type": "string",
+            "description": "IP address of a DNS nameserver."
+          }
+        },
+        "domain": {
+          "type": "string",
+          "description": "Local domain name for short hostname lookups.",
+          "examples": ["cluster.local", "example.com"]
+        },
+        "search": {
+          "type": "array",
+          "description": "DNS search domains for hostname resolution.",
+          "items": {
+            "type": "string",
+            "description": "A DNS search domain."
+          }
+        },
+        "options": {
+          "type": "array",
+          "description": "DNS resolver options as a list of option strings.",
+          "items": {
+            "type": "string",
+            "description": "A resolver option string, e.g. 'ndots:5' or 'single-request'."
+          }
+        }
+      }
+    },
+    "Route": {
+      "type": "object",
+      "description": "A network route to add in the container network namespace.",
+      "required": ["dst"],
+      "properties": {
+        "dst": {
+          "type": "string",
+          "description": "Destination network in CIDR notation.",
+          "examples": ["0.0.0.0/0", "10.0.0.0/8", "192.168.0.0/16"]
+        },
+        "gw": {
+          "type": "string",
+          "description": "Next-hop gateway IP address for this route. If omitted, uses the subnet gateway.",
+          "format": "ipv4"
+        },
+        "mtu": {
+          "type": "integer",
+          "description": "Maximum Transmission Unit for this route.",
+          "minimum": 68,
+          "maximum": 65535
+        },
+        "advmss": {
+          "type": "integer",
+          "description": "Advertised maximum segment size for TCP connections on this route.",
+          "minimum": 1
+        }
+      }
+    },
+    "IPRange": {
+      "type": "object",
+      "description": "An IP address range for IPAM allocation with optional gateway and subnet constraints.",
+      "properties": {
+        "subnet": {
+          "type": "string",
+          "description": "CIDR subnet this range belongs to.",
+          "examples": ["10.244.0.0/24"]
+        },
+        "rangeStart": {
+          "type": "string",
+          "description": "First usable IP address in this range.",
+          "format": "ipv4"
+        },
+        "rangeEnd": {
+          "type": "string",
+          "description": "Last usable IP address in this range.",
+          "format": "ipv4"
+        },
+        "gateway": {
+          "type": "string",
+          "description": "Gateway IP address for this range.",
+          "format": "ipv4"
+        }
+      }
+    },
+    "PortMapping": {
+      "type": "object",
+      "description": "A port mapping rule forwarding traffic from a host port to a container port.",
+      "required": ["containerPort"],
+      "properties": {
+        "containerPort": {
+          "type": "integer",
+          "description": "Port number inside the container.",
+          "minimum": 1,
+          "maximum": 65535
+        },
+        "hostPort": {
+          "type": "integer",
+          "description": "Port number on the host to map from.",
+          "minimum": 0,
+          "maximum": 65535
+        },
+        "protocol": {
+          "type": "string",
+          "description": "IP protocol for this port mapping.",
+          "enum": ["tcp", "udp", "sctp"],
+          "default": "tcp"
+        },
+        "hostIP": {
+          "type": "string",
+          "description": "Host IP address to bind this port mapping to. If empty, binds to all interfaces."
+        }
+      }
+    },
+    "BandwidthEntry": {
+      "type": "object",
+      "description": "Traffic bandwidth limits for the container interface, applied using the Linux traffic control subsystem.",
+      "properties": {
+        "ingressRate": {
+          "type": "integer",
+          "description": "Ingress (download) rate limit in bits per second.",
+          "minimum": 0
+        },
+        "ingressBurst": {
+          "type": "integer",
+          "description": "Ingress burst size in bits. The maximum amount of traffic allowed to burst above the rate limit.",
+          "minimum": 0
+        },
+        "egressRate": {
+          "type": "integer",
+          "description": "Egress (upload) rate limit in bits per second.",
+          "minimum": 0
+        },
+        "egressBurst": {
+          "type": "integer",
+          "description": "Egress burst size in bits. The maximum amount of traffic allowed to burst above the rate limit.",
+          "minimum": 0
+        }
+      }
+    },
+    "Result": {
+      "type": "object",
+      "description": "The CNI result object returned by a plugin after a successful ADD operation, or passed as prevResult to subsequent plugins in a chain. Contains the assigned interfaces, IP addresses, routes, and DNS configuration.",
+      "required": ["cniVersion"],
+      "properties": {
+        "cniVersion": {
+          "type": "string",
+          "description": "The CNI specification version of this result.",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "interfaces": {
+          "type": "array",
+          "description": "List of network interfaces created or configured by this plugin.",
+          "items": {
+            "$ref": "#/$defs/Interface"
+          }
+        },
+        "ips": {
+          "type": "array",
+          "description": "List of IP addresses assigned to the container's network interfaces.",
+          "items": {
+            "$ref": "#/$defs/IPConfig"
+          }
+        },
+        "routes": {
+          "type": "array",
+          "description": "List of routes added in the container network namespace.",
+          "items": {
+            "$ref": "#/$defs/Route"
+          }
+        },
+        "dns": {
+          "$ref": "#/$defs/DNS"
+        }
+      }
+    },
+    "Interface": {
+      "type": "object",
+      "description": "A network interface created or configured by a CNI plugin.",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the network interface, e.g. 'eth0' or 'veth1234abcd'.",
+          "examples": ["eth0", "net1", "veth1a2b3c4d"]
+        },
+        "mac": {
+          "type": "string",
+          "description": "MAC address of the interface.",
+          "pattern": "^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$",
+          "examples": ["0a:58:0a:f4:00:01"]
+        },
+        "mtu": {
+          "type": "integer",
+          "description": "MTU of the interface in bytes.",
+          "minimum": 68,
+          "maximum": 65535
+        },
+        "sandbox": {
+          "type": "string",
+          "description": "Path to the network namespace containing this interface. Empty for host-side interfaces.",
+          "examples": ["/proc/12345/ns/net", "/var/run/netns/mynet"]
+        },
+        "socketPath": {
+          "type": "string",
+          "description": "Path to a socket for plugins that communicate via a Unix domain socket."
+        },
+        "pciID": {
+          "type": "string",
+          "description": "PCI ID of the device underlying this interface, used for SR-IOV.",
+          "examples": ["0000:03:00.1"]
+        }
+      }
+    },
+    "IPConfig": {
+      "type": "object",
+      "description": "An IP address configuration assigned to a container interface.",
+      "required": ["address"],
+      "properties": {
+        "address": {
+          "type": "string",
+          "description": "IP address and prefix length in CIDR notation assigned to the interface.",
+          "examples": ["10.244.0.5/24", "fd00::1/64"]
+        },
+        "gateway": {
+          "type": "string",
+          "description": "Default gateway IP address for this address.",
+          "examples": ["10.244.0.1", "fd00::1"]
+        },
+        "interface": {
+          "type": "integer",
+          "description": "Index into the interfaces array identifying which interface this IP is assigned to.",
+          "minimum": 0
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "cniVersion": "1.0.0",
+      "name": "mynet",
+      "type": "bridge",
+      "bridge": "cni0",
+      "isGateway": true,
+      "ipMasq": true,
+      "ipam": {
+        "type": "host-local",
+        "subnet": "10.244.0.0/24",
+        "routes": [
+          { "dst": "0.0.0.0/0" }
+        ]
+      },
+      "dns": {
+        "nameservers": ["10.96.0.10"],
+        "search": ["default.svc.cluster.local", "svc.cluster.local", "cluster.local"],
+        "options": ["ndots:5"]
+      }
+    }
+  ]
+}

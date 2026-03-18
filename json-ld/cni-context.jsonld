@@ -1,0 +1,169 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "cni": "https://www.cni.dev/vocabulary#",
+    "k8s": "https://kubernetes.io/vocabulary#",
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dcterms": "http://purl.org/dc/terms/",
+
+    "NetworkConfig": {
+      "@id": "cni:NetworkConfig",
+      "@context": {
+        "cniVersion": "cni:specVersion",
+        "name": "schema:name",
+        "type": "cni:pluginType",
+        "ipMasq": "cni:ipMasquerade",
+        "ipam": "cni:ipamConfiguration",
+        "dns": "cni:dnsConfiguration",
+        "capabilities": "cni:pluginCapabilities",
+        "runtimeConfig": "cni:runtimeConfiguration",
+        "prevResult": "cni:previousResult"
+      }
+    },
+
+    "NetworkConfigList": {
+      "@id": "cni:NetworkConfigList",
+      "@context": {
+        "cniVersion": "cni:specVersion",
+        "name": "schema:name",
+        "disableCheck": "cni:disableCheck",
+        "disableGC": "cni:disableGarbageCollection",
+        "plugins": {
+          "@id": "cni:plugins",
+          "@container": "@set"
+        }
+      }
+    },
+
+    "Result": {
+      "@id": "cni:Result",
+      "@context": {
+        "cniVersion": "cni:specVersion",
+        "interfaces": {
+          "@id": "cni:networkInterfaces",
+          "@container": "@set"
+        },
+        "ips": {
+          "@id": "cni:ipAddresses",
+          "@container": "@set"
+        },
+        "routes": {
+          "@id": "cni:networkRoutes",
+          "@container": "@set"
+        },
+        "dns": "cni:dnsConfiguration"
+      }
+    },
+
+    "Interface": {
+      "@id": "cni:NetworkInterface",
+      "@context": {
+        "name": "schema:name",
+        "mac": "cni:macAddress",
+        "mtu": "cni:mtu",
+        "sandbox": {
+          "@id": "cni:networkNamespace",
+          "@type": "@id"
+        },
+        "pciID": "cni:pciDeviceID"
+      }
+    },
+
+    "IPConfig": {
+      "@id": "cni:IPAddress",
+      "@context": {
+        "address": "cni:cidrAddress",
+        "gateway": {
+          "@id": "cni:gatewayAddress",
+          "@type": "@id"
+        },
+        "interface": "cni:interfaceIndex"
+      }
+    },
+
+    "Route": {
+      "@id": "cni:NetworkRoute",
+      "@context": {
+        "dst": {
+          "@id": "cni:destinationNetwork",
+          "@type": "@id"
+        },
+        "gw": {
+          "@id": "cni:nextHopGateway",
+          "@type": "@id"
+        },
+        "mtu": "cni:routeMTU"
+      }
+    },
+
+    "DNS": {
+      "@id": "cni:DNSConfig",
+      "@context": {
+        "nameservers": {
+          "@id": "cni:nameservers",
+          "@container": "@set"
+        },
+        "domain": "cni:defaultDomain",
+        "search": {
+          "@id": "cni:searchDomains",
+          "@container": "@set"
+        },
+        "options": {
+          "@id": "cni:resolverOptions",
+          "@container": "@set"
+        }
+      }
+    },
+
+    "IPAM": {
+      "@id": "cni:IPAMConfig",
+      "@context": {
+        "type": "cni:ipamPluginType",
+        "subnet": "cni:subnetCIDR",
+        "rangeStart": "cni:rangeStartIP",
+        "rangeEnd": "cni:rangeEndIP",
+        "gateway": {
+          "@id": "cni:gatewayAddress",
+          "@type": "@id"
+        },
+        "routes": {
+          "@id": "cni:networkRoutes",
+          "@container": "@set"
+        }
+      }
+    },
+
+    "PortMapping": {
+      "@id": "cni:PortMapping",
+      "@context": {
+        "containerPort": "cni:containerPort",
+        "hostPort": "cni:hostPort",
+        "protocol": "cni:networkProtocol",
+        "hostIP": {
+          "@id": "cni:hostBindAddress",
+          "@type": "@id"
+        }
+      }
+    },
+
+    "BandwidthConfig": {
+      "@id": "cni:BandwidthConfig",
+      "@context": {
+        "ingressRate": "cni:ingressRateBps",
+        "ingressBurst": "cni:ingressBurstBits",
+        "egressRate": "cni:egressRateBps",
+        "egressBurst": "cni:egressBurstBits"
+      }
+    },
+
+    "Error": {
+      "@id": "cni:PluginError",
+      "@context": {
+        "code": "cni:errorCode",
+        "msg": "schema:description",
+        "details": "cni:errorDetails"
+      }
+    }
+  }
+}
