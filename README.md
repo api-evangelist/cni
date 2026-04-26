@@ -7,7 +7,7 @@ CNI (Container Network Interface) is a CNCF-incubating project that defines a sp
 ## Scope
 
 - **Type:** Index
-- **x-type:** standard
+- **x-type:** opensource
 - **Access:** 3rd-Party
 
 ## Tags
