@@ -1,0 +1,169 @@
+# Naftiko capabilities profile for the Container Network Interface (CNI).
+# CNI is an exec/stdin specification - not an HTTP API - so capabilities
+# map to plugin invocation operations defined by the spec, plus the
+# data-shape of the network configuration and result documents that
+# flow between container runtimes (e.g. Kubernetes / containerd / CRI-O)
+# and CNI plugins.
+provider: cni
+name: Container Network Interface
+description: >-
+  CNCF-incubating Container Network Interface specification: the contract by
+  which container runtimes invoke network plugins to attach, detach, and
+  inspect container network interfaces. Capabilities here describe the four
+  CNI operations and the meta-plugin chaining model.
+capabilities:
+  - id: cni.plugin.add
+    name: Plugin ADD
+    description: Attach a container to a network. The runtime invokes the plugin with CNI_COMMAND=ADD and the network configuration JSON on stdin; the plugin returns a Result document describing the assigned interfaces, IPs, routes, and DNS.
+    api: cni:cni-spec
+    inputs:
+      - cniVersion
+      - name
+      - type
+      - containerId
+      - netns
+      - ifName
+      - args
+      - path
+    outputs:
+      - cniVersion
+      - interfaces
+      - ips
+      - routes
+      - dns
+
+  - id: cni.plugin.del
+    name: Plugin DEL
+    description: Detach a container from a network. The runtime invokes the plugin with CNI_COMMAND=DEL using the same configuration that was used for ADD; the plugin tears down resources allocated to the container.
+    api: cni:cni-spec
+    inputs:
+      - cniVersion
+      - name
+      - type
+      - containerId
+      - netns
+      - ifName
+    outputs:
+      - status
+
+  - id: cni.plugin.check
+    name: Plugin CHECK
+    description: Verify the container's network attachment matches the prior ADD result. The runtime invokes the plugin with CNI_COMMAND=CHECK; the plugin reports any inconsistencies.
+    api: cni:cni-spec
+    inputs:
+      - cniVersion
+      - name
+      - type
+      - containerId
+      - netns
+      - ifName
+      - prevResult
+    outputs:
+      - status
+
+  - id: cni.plugin.version
+    name: Plugin VERSION
+    description: Report the CNI specification versions a plugin supports. The runtime invokes the plugin with CNI_COMMAND=VERSION and reads the supported versions list from stdout.
+    api: cni:cni-spec
+    inputs:
+      - cniVersion
+    outputs:
+      - cniVersion
+      - supportedVersions
+
+  - id: cni.config.parse
+    name: Parse network configuration
+    description: Validate a CNI network configuration document against the published JSON Schema and resolve plugin chain references.
+    api: cni:cni-spec
+    inputs:
+      - configurationDocument
+    outputs:
+      - parsedConfig
+      - validationErrors
+
+  - id: cni.result.parse
+    name: Parse plugin result
+    description: Validate a CNI Result document (interfaces, IPs, routes, DNS) returned by a plugin against the published JSON Schema.
+    api: cni:cni-spec
+    inputs:
+      - resultDocument
+    outputs:
+      - parsedResult
+      - validationErrors
+
+  - id: cni.plugins.bridge
+    name: bridge plugin
+    description: Reference plugin that creates a Linux bridge and connects container veth pairs into it.
+    api: cni:cni-plugins
+    inputs:
+      - bridge
+      - isGateway
+      - ipMasq
+      - mtu
+    outputs:
+      - interface
+      - ip
+      - route
+
+  - id: cni.plugins.ipvlan
+    name: ipvlan plugin
+    description: Reference plugin that adds an IPVLAN interface to the container network namespace.
+    api: cni:cni-plugins
+    inputs:
+      - master
+      - mode
+      - ipam
+    outputs:
+      - interface
+
+  - id: cni.plugins.macvlan
+    name: macvlan plugin
+    description: Reference plugin that adds a MACVLAN interface to the container network namespace.
+    api: cni:cni-plugins
+    inputs:
+      - master
+      - mode
+      - ipam
+    outputs:
+      - interface
+
+  - id: cni.plugins.host-device
+    name: host-device plugin
+    description: Reference plugin that moves an existing host device into the container netns.
+    api: cni:cni-plugins
+    inputs:
+      - device
+    outputs:
+      - interface
+
+  - id: cni.plugins.portmap
+    name: portmap meta-plugin
+    description: Meta-plugin that publishes container ports to the host via iptables/nftables NAT.
+    api: cni:cni-plugins
+    inputs:
+      - portMappings
+      - snat
+    outputs:
+      - status
+
+  - id: cni.plugins.bandwidth
+    name: bandwidth meta-plugin
+    description: Meta-plugin that applies ingress/egress traffic shaping using tc.
+    api: cni:cni-plugins
+    inputs:
+      - ingressRate
+      - ingressBurst
+      - egressRate
+      - egressBurst
+    outputs:
+      - status
+
+  - id: cni.plugins.firewall
+    name: firewall meta-plugin
+    description: Meta-plugin that applies iptables/nftables firewall rules for a container.
+    api: cni:cni-plugins
+    inputs:
+      - backend
+      - ingressPolicy
+    outputs:
+      - status
