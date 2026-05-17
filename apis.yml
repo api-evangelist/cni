@@ -1,6 +1,6 @@
 aid: cni
 name: Container Network Interface (CNI)
-x-type: opensource
+kind: opensource
 description: >-
   CNI (Container Network Interface) is a CNCF-incubating project that defines a
   specification and libraries for configuring network interfaces in Linux
