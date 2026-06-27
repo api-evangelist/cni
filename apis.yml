@@ -47,7 +47,7 @@ apis:
         url: json-schema/cni-result-schema.json
       - type: JSONLDContext
         url: json-ld/cni-context.jsonld
-      - type: NaftikoCapabilities
+      - type: X-NaftikoCapabilities
         url: capabilities/cni-spec-capabilities.yml
     tags:
       - Network Plugins
@@ -88,7 +88,7 @@ apis:
         url: https://www.cni.dev/plugins/current/
       - type: GitHubRepository
         url: https://github.com/containernetworking/plugins
-      - type: NaftikoCapabilities
+      - type: X-NaftikoCapabilities
         url: capabilities/cni-spec-capabilities.yml
     tags:
       - Containers
@@ -139,7 +139,7 @@ common:
     url: json-schema/cni-network-config-schema.json
   - type: JSONSchema
     url: json-schema/cni-result-schema.json
-  - type: NaftikoCapabilities
+  - type: X-NaftikoCapabilities
     url: capabilities/cni-spec-capabilities.yml
 maintainers:
   - FN: Kin Lane
