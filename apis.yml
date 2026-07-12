@@ -123,6 +123,8 @@ apis:
       - name: Multi-Network Pods
         description: Combine reference plugins via Multus or chains for multi-NIC pods.
 common:
+  - type: DomainSecurity
+    url: security/cni-domain-security.yml
   - type: Website
     url: https://www.cni.dev/
   - type: Documentation
