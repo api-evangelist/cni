@@ -26,6 +26,13 @@ accessModel:
   method: derived
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/cni.png
 tags:
+  - Cloud-Native
+  - Containers
+  - Incubating
+  - Kubernetes
+  - Networking
+  - Plugins
+tags_raw:
   - Cloud Native
   - Containers
   - Incubating
