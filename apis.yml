@@ -12,6 +12,18 @@ description: >-
   reference plugins (bridge, ipvlan, macvlan, host-device, ptp, loopback) and
   meta-plugins (portmap, bandwidth, firewall, sbr).
 url: https://www.cni.dev
+deliveryModel:
+  model: self-hosted
+  license: Apache-2.0
+  open_source: true
+  commercial: false
+  callable_host: false
+  label: Self-hosted open source · you run it yourself
+  confidence: high
+  source:
+  - license
+  generated: '2026-08-28'
+  method: derived
 accessModel:
   pricing: freemium
   onboarding: unknown
