@@ -150,6 +150,12 @@ apis:
       - name: Multi-Network Pods
         description: Combine reference plugins via Multus or chains for multi-NIC pods.
 common:
+  - type: Plans
+    url: plans/cni-plans-pricing.yml
+  - type: RateLimits
+    url: rate-limits/cni-rate-limits.yml
+  - type: FinOps
+    url: finops/cni-finops.yml
   - type: IssueTracker
     url: https://github.com/containernetworking/cni/issues
   - type: Releases
