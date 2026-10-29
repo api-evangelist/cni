@@ -1,4 +1,4 @@
-# Container Network Interface (cni)
+# Container Network Interface (CNI)
 
 <!-- API-EVANGELIST-PROVENANCE:BEGIN -->
 > ### About this repository
@@ -64,95 +64,123 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-CNI (Container Network Interface) is a CNCF-incubating project that defines a specification and libraries for configuring network interfaces in Linux containers. It provides a simple exec/stdin interface between the container runtime and network implementation plugins, enabling pluggable networking for Kubernetes and other container orchestrators. The CNI spec defines four operations (ADD, DEL, CHECK, VERSION), a network configuration document, and a plugin Result document. CNI also publishes reference plugins (bridge, ipvlan, macvlan, host-device, ptp, loopback) and meta-plugins (portmap, bandwidth, firewall, sbr).
+CNI (Container Network Interface) is a CNCF-incubating project that defines a specification and libraries for configuring network interfaces in Linux containers. It provides a simple exec/stdin interface between the container runtime and network implementation plugins, enabling pluggable networking for Kubernetes and other container orchestrators. The CNI spec defines four operations (ADD, DEL, CHECK, VERSION), a network configuration document format, and a plugin Result document. CNI also publishes a collection of reference plugins (bridge, ipvlan, macvlan, host-device, ptp, loopback) and meta-plugins (portmap, bandwidth, firewall, sbr).
 
-**URL:** [https://raw.githubusercontent.com/api-evangelist/cni/refs/heads/main/apis.yml](https://raw.githubusercontent.com/api-evangelist/cni/refs/heads/main/apis.yml)
+**Areas:** Cloud-Native · Containers · Incubating · Kubernetes · Networking · Plugins
 
-## Scope
+## Container Network Interface (CNI) on APIs.io
 
-- **Type:** Index
-- **x-type:** opensource
-- **Access:** 3rd-Party
+Everything profiled for Container Network Interface (CNI) is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/cni/](https://apis.io/providers/cni/)** — or go straight to one of the APIs or properties below.
 
-## Tags
+### APIs (2)
 
-- Cloud Native
-- Containers
-- Incubating
-- Kubernetes
-- Networking
-- Plugins
+- [CNI Specification](https://apis.io/apis/cni/cni-spec/) — The CNI specification defines the interface between container runtimes and network plugins. It specifies how runtimes invoke plugins via environment…
+- [CNI Reference Plugins](https://apis.io/apis/cni/cni-plugins/) — A collection of reference and example networking plugins maintained by the containernetworking team that implement the CNI specification. Includes main…
 
-## Timestamps
+### Published properties
 
-- **Created:** 2026-03-16
-- **Modified:** 2026-04-23
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-## APIs
+#### JSON Schema (2)
 
-### CNI Specification
+The data models the API reads and writes.
 
-The CNI specification defines the interface between container runtimes and network plugins. It specifies how runtimes invoke plugins via environment variables (CNI_COMMAND, CNI_CONTAINERID, CNI_NETNS, CNI_IFNAME, CNI_PATH, CNI_ARGS) and stdin configuration, and how plugins respond on stdout with network interface details.
+- [CNI Network Configuration](https://apis.io/schemas/cni/cni-network-config/)
+- [CNI Plugin Result](https://apis.io/schemas/cni/cni-result/)
 
-**Human URL:** [https://www.cni.dev/docs/spec/](https://www.cni.dev/docs/spec/)
+#### JSON-LD (1)
 
-#### Tags
+Linked-data contexts for the provider's vocabulary.
 
-- Network Plugins, Specification
+- [Cni Context](https://apis.io/jsonld/cni/cni-context/)
 
-#### Properties
+#### Governance rules (1)
 
-- [Documentation](https://www.cni.dev/docs/spec/)
-- [GitHub Repository](https://github.com/containernetworking/cni)
-- [Network Config JSON Schema](json-schema/cni-network-config-schema.json)
-- [Result JSON Schema](json-schema/cni-result-schema.json)
-- [JSON-LD Context](json-ld/cni-context.jsonld)
-- [Naftiko Capabilities](capabilities/cni-spec-capabilities.yml)
+Spectral rulesets for the provider's contracts.
 
-#### Features
+- [Container Network Interface (CNI) — jsonschema rules](https://apis.io/rules/cni/cni-jsonschema-spectral-rules/)
 
-- **ADD operation:** Attach a container to a network and return a Result document.
-- **DEL operation:** Detach a container from a network and tear down resources.
-- **CHECK operation:** Verify the container's current attachment matches the prior ADD result.
-- **VERSION operation:** Report the CNI spec versions a plugin supports.
-- **Plugin Chaining:** Meta-plugin chaining with prevResult.
-- **Network Config Schema:** JSON document describing a network and its plugin chain.
-- **Result Schema:** JSON document plugins emit on stdout.
+#### Security (1)
 
-#### Use Cases
+Authentication, trust centre, and vulnerability disclosure.
 
-- **Kubernetes CNI Plugin:** Implement a CNI plugin that integrates with Kubernetes / containerd / CRI-O.
-- **Network Validation:** Validate network configurations and plugin Result documents against the spec.
-- **Custom SDN:** Build custom software-defined networks for containers using a portable plugin contract.
+- [Cni Domain Security](https://apis.io/security/cni/cni-domain-security/)
 
-### CNI Reference Plugins
+#### Plans and pricing (1)
 
-A collection of reference networking plugins (bridge, ipvlan, macvlan, ptp, host-device, loopback) and meta-plugins (portmap, bandwidth, firewall, sbr, tuning) maintained by the containernetworking team.
+Published plans, tiers and prices.
 
-**Human URL:** [https://www.cni.dev/plugins/current/](https://www.cni.dev/plugins/current/)
+- [Cni Plans Pricing](https://apis.io/plans/cni/cni-plans-pricing/)
 
-#### Tags
+#### Rate limits (1)
 
-- Containers, Kubernetes, Linux, Network Plugins, Networking
+Published request limits.
 
-#### Properties
+- [Cni Rate Limits](https://apis.io/rate-limits/cni/cni-rate-limits/)
 
-- [Documentation](https://www.cni.dev/plugins/current/)
-- [GitHub Repository](https://github.com/containernetworking/plugins)
-- [Naftiko Capabilities](capabilities/cni-spec-capabilities.yml)
+#### FinOps (1)
 
-## Common Properties
+What the API costs to run, by operation.
+
+- [Cni Finops](https://apis.io/finops/cni/cni-finops/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
 
 - [Website](https://www.cni.dev/)
 - [Documentation](https://www.cni.dev/docs/)
-- [GitHub Organization](https://github.com/containernetworking)
-- [Network Config JSON Schema](json-schema/cni-network-config-schema.json)
-- [Result JSON Schema](json-schema/cni-result-schema.json)
-- [JSON-LD Context](json-ld/cni-context.jsonld)
-- [Naftiko Capabilities](capabilities/cni-spec-capabilities.yml)
+- [GitHub](https://github.com/containernetworking)
 
-## Maintainers
+## API Evangelist rating
 
-**FN:** Kin Lane
+**Kin Score 24.0** — emerging · rubric 0.24.0 · scored 2026-10-17
 
-**Email:** kin@apievangelist.com
+| Facet | Score |
+|---|---|
+| Discoverability | 64.3 |
+| Contract quality | 22.7 |
+| Contract governance | 9.8 |
+| Operational transparency | 26.3 |
+| Developer ergonomics | 9.5 |
+| Access clarity | 7.9 |
+
+**Agent readiness 0.6** — human-only
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | — |
+| Agentic Access | — |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | — |
+| Idempotency | — |
+| Error Semantics | — |
+| OpenAPI Examples | — |
+| Rate Limit Signal | derived (partial credit) |
+| Event Surface Described | — |
+| Agent Skills | — |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+
+**Regulatory alignment 10.8** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/cni/](https://apis.io/providers/cni/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Container Network Interface (CNI): the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/cni/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
